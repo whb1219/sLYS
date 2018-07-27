@@ -1,0 +1,1966 @@
+package LCT;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Scanner;
+
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.GrayFilter;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+
+import com.bluewalrus.chart.axis.YAxis;
+import com.bluewalrus.pie.PieChart;
+import com.bluewalrus.pie.Segment;
+
+import jxl.Cell;
+import jxl.Image;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor.GREY_25_PERCENT;
+import org.apache.poi.ss.usermodel.CellType;
+
+
+public class Gui extends JPanel {
+	/*
+	 create a CUI with frame, panels, labels, droplists, text fields and buttons 
+	 create action to read date and calcualte and generate results base on data read
+	 */
+	private static final long serialVersionUID = 1L;
+//interface	
+	static JTabbedPane tp	= new JTabbedPane();	//main tab panel
+	JTabbedPane tp0	= new JTabbedPane();	//sub tab panel
+	static JFrame frame, frame1,frame2,frame3,frame4,frame5,frame6,frame7, frame_r,frame_db ;
+	static JPanel 	panel_m, panel_n,panel_FC,	panel, 				
+	panel0, panel0_0, 
+	panel_w,
+	panel1, panel1_0, 
+			panel1_1, 
+			panel1_2, 
+	panel2, panel2_0, 
+	panel3,	panel3_0, 
+	panel4,	panel4_0,
+	panel5,
+	panel6,
+	panel_chart1, panel_chart2, panel_chart3,panel_chart4,panel_chart5,panel_chart6,panel_chart7, panel_chart_r,panel_db;									//all panels
+	static Dimension screenSize = new Dimension (800,700);
+			//Toolkit.getDefaultToolkit().getScreenSize();//new Dimension (300,200); //
+	static Dimension size = new Dimension (800,200); //frame size
+	JTextField field;						//textfield
+	JTextArea area;
+	
+	Font font_0 = new Font("Arial", Font.BOLD,12);
+	Font font_1 = new Font("Arial", Font.BOLD,18);
+	
+	Font font_2 = new Font("Arial", Font.BOLD,36);
+	
+
+	static JMenuBar menuBar;
+	static JMenu menu, submenu;
+	static JMenuItem menuItem;
+	static JRadioButtonMenuItem rbMenuItem;
+	static JCheckBoxMenuItem cbMenuItem;
+	
+	
+//define all the strings based on phases and activities	
+
+	String [] Phase = 		{"Welcome","Design", "C_H","C_M","C_A","Operation","Maintenance","Scrapping", "Report","Comparisons"};
+	
+	String [] Welcome = 	{"Objectives", "Impact", "Approaches"};
+	String [] Description = 	{	"Developed models of life cycel approaches (LCCA, LCA and RA) can compare different design/"
+			+ "\n"+"maintenance/replacement strategiesfor ships from a through life perspecitvie by quantifying:"
+			+"\n"+ "  	-Direct economic costs of production (Capex)"
+			+"\n"+ "  	-Operation and maintenance cost (Opex;regular costs)"
+			+"\n"+ "  	-Repair and refurbishmeng costs and end-of-life costs (Opex; one-off costs)"
+			+"\n"+ "  	-Impact on environment"
+			+"\n"+ " 	-Risks", 
+			
+			"The SHIPLYS system is intended to be used by the shipyards and associated design consultants, "
+					+"\n"+ "in conjunction with their clients the owners and operators, to provide optimised design and costing"
+										+"\n"+ "at the early stages of design, leading to improved life cycle"
+												+ " management through production, operation,"
+										+"\n"+ "refits and end of life disposal and to meet the increasing requirements for LCCA (lifecycle cost analyses), "
+										+"\n"+ "environmental assessments, risk assessments and end-of-life considerations.",			
+								
+								""};
+
+	
+	String [] Design = 		{"Case Name","Life Span", "Present Value","Interest","Sensitivity level", "Ship total price"};
+	String [] C_H = 		{"Purchase", "Cutting", "Bending", "Welding", "Coating", "Outfitting"};
+	String [] C_M = 		{"Engine", "Battery", "Engine Transportation","Battery Transportation", "Installation"};
+	String [] C_A = 		{"Purchase", "Cutting", "Welding", "Coating", "Outfitting"};
+	String [] Operation = 	{"Operation profile", "Fuel oil", "Lub oil","Transportation"};
+	String [] Maintenance = {"Preventive", "Corrective", "Docking", "Labour", "Spare"};
+	String [] Scrapping = 	{"Scrapping","Transport", "Energy", "Material"};
+	
+	
+	ArrayList<String> q = new ArrayList<String>();
+	
+	String Trans_type, Electricity_type, FO_type, LO_type,Trans_type_LO, Cut_type, Trans_type_S, E_type_S, F_type_S;
+	
+	
+	int activity_length = Design.length+C_H.length+C_M.length+C_A.length+Operation.length+Maintenance.length+Scrapping.length;
+
+//combobox	= droplist
+	JComboBox<String> cb;					 
+	JComboBox<String>[] cb_m;	
+	JComboBox<String> cbtest;
+	JTable table_db1 ;
+	JTable table_db2 ;
+	Object[][] tableData;
+	TableModel DTM;
+	int i = 0;
+
+//set up database in a default folder	
+	File file = new File ("C:/Users/tjb12178/workspace/E_model/db/");
+	File[]file_group = file.listFiles();
+	Workbook wb_num = Workbook.getWorkbook(new File(("C:/Users/tjb12178/workspace/E_model/db/template.xls")));
+	Workbook trans,electricity, FO, LO,trans_lo, cut, trans_s, E_s,F_s;	
+//set up data length of database	
+	int data_length = wb_num.getSheet(0).getRows() ;
+	Workbook [] wb = new Workbook[file_group.length];
+	Sheet[] sheet = new Sheet[file_group.length];
+	Cell[][]	item0  = new Cell[file_group.length][data_length];
+	Cell[][]	cell0  = new Cell[file_group.length][data_length];
+	Cell[][]	cell1  = new Cell[file_group.length][data_length];
+	Cell[][]	cell2  = new Cell[file_group.length][data_length];
+	Cell[][]	unit0  = new Cell[file_group.length][data_length];
+	String[][]	content0  = new String[file_group.length][data_length];
+	String[][]	content1  = new String[file_group.length][data_length];
+	String[][]	content2  = new String[file_group.length][data_length];
+	String[][]	content3  = new String[file_group.length][data_length];
+	String[][]	content4  = new String[file_group.length][data_length];
+
+	String[] 	choices = new String[file_group.length];
+	String[] 	choices_NAME = new String[file_group.length];
+	
+	 double [] a_result =new double[5];
+	 double [] b_result =new double[5];
+	 double [] c_result =new double[5];
+	
+
+//	WritableSheet RS = RB.createSheet("Sheet1", 0);
+//	WritableCell RC = RS.getWritableCell(0, 0);
+	
+	
+//  Workbook RB = Workbook.getWorkbook(new File(("C:/Users/tjb12178/workspace/04012018/result.xls")));
+
+//build a template column and data comes from excel database
+	public String[] data0 = new String[data_length];	
+	public String[] data1 = new String[data_length];	
+	public String[] data2 = new String[data_length];
+	public String[] data3 = new String[data_length];
+	public String[] data4 = new String[data_length];
+
+//build a template table include previous column	
+	Object[][] 	data;
+//build a column include the select column for each activity		
+	String[][] data_m1	= new String[data_length][activity_length];
+	String[][] data_m2	= new String[data_length][activity_length];
+	String[][] data_m3	= new String[data_length][activity_length];
+	String[][] data_m	= new String[data_length][activity_length];
+	
+//construction function
+	@SuppressWarnings("unchecked")
+	public Gui() throws BiffException, IOException{
+		for (i=0; i<file_group.length;i++){
+			wb[i] = Workbook.getWorkbook(file_group[i]);
+			sheet[i]  = wb[i].getSheet(0);
+			for(int j = 0 ; j<data_length ; j++){
+				item0[i][j]=sheet[i].getCell(1, j);
+				cell0[i][j]=sheet[i].getCell(2, j);
+				cell1[i][j]=sheet[i].getCell(3, j);
+				cell2[i][j]=sheet[i].getCell(4, j);
+				unit0[i][j]=sheet[i].getCell(5, j);
+				
+				content0[i][j]=item0	[i][j].getContents();
+				content1[i][j]=cell0	[i][j].getContents();
+				content2[i][j]=cell1	[i][j].getContents();
+				content3[i][j]=cell2	[i][j].getContents();
+				content4[i][j]=unit0	[i][j].getContents();
+			}}
+//icon		
+		ImageIcon ii = createImageIcon("C:/Users/tjb12178/workspace/04012018/icon.png");	
+
+		
+//Welcome page
+		panel_w = createPanel("");	//add panel 
+	     tp.addTab("Welcome",ii,panel_w,"Welcome");
+	     add(tp);
+	     tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	     tp.setTabPlacement(JTabbedPane.TOP);
+	     
+	     panel_w.setLayout(new GridBagLayout());
+	     GridBagConstraints c_w = new GridBagConstraints();
+	     JPanel[] j_w = new JPanel[Welcome.length];
+	     JTextArea[] area_w = new JTextArea[Welcome.length];
+	     c_w.fill = GridBagConstraints.VERTICAL;
+
+	     for (i=0;i<Welcome.length-1;i++){
+	    	 j_w[i] = createNewPanel(Welcome[i]);
+	    	 j_w[i].setName(Welcome[i]);
+		        
+			    c_w.weighty = 1;
+			    c_w.gridy = i;
+			    c_w.gridx = 0;
+			    panel_w.add(j_w[i], c_w);
+				area_w[i]=area;			    
+				area_w[i].setText(Description[i]);
+				area_w[i].setBackground(Color.WHITE);
+				area_w[i].setFont(font_0);
+				}
+			JLabel TP_lbl = new JLabel(Welcome[2]);	
+			TP_lbl.setFont(font_1);
+			//TP_lbl.setPreferredSize(new Dimension(50,35));
+			c_w.weightx = 0;
+		    c_w.gridy = 2;
+		    c_w.gridx = 0;
+			panel_w.add(TP_lbl,c_w);
+	     	JTextPane TP = new JTextPane();
+			TP.insertIcon(new ImageIcon ( "C:\\Users\\tjb12178\\workspace\\04012018\\approach.png" ));
+			TP.setEditable(false);
+		    c_w.weightx = 0;
+		    c_w.gridy = 3;
+		    c_w.gridx = 0;
+			panel_w.add(TP,c_w);
+			    //field_w[i]= new JTextField(Description[i]) ;
+
+			    
+
+	     
+			    	    
+	       
+	     
+		
+		
+		
+		
+		
+//Design phase		
+		 panel0 = createPanel("");	//add panel 
+	     tp.addTab("Design",ii,panel0,"Design");
+	     add(tp);
+	     tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	     tp.setTabPlacement(JTabbedPane.TOP);
+          
+	     panel0.setLayout(new GridBagLayout());
+	     GridBagConstraints c = new GridBagConstraints();
+	     JPanel[] j0 = new JPanel[Design.length];
+	     JTextField[] field0 = new JTextField[Design.length];
+	     JComboBox<String>[]  cb0	=	new JComboBox[Design.length];
+	     ActionListener[] db0 = new ActionListener[Design.length];
+	     
+	     for (i=0;i<Design.length;i++){
+	    	 j0[i] = createsubPanel(String.valueOf(i)+" "+Design[i]);
+	    	 j0[i].setName(Design[i]);
+		        c.fill = GridBagConstraints.HORIZONTAL;
+			    c.weightx = 2;
+			    c.gridx = i%3;
+			    c.gridy = Math.round(i/3);
+			    if (j0[i].getName()==""){}
+			    else {panel0.add(j0[i], c);}
+			    field0[i] = field;
+			    cb0[i]=cb;}    
+	     
+//C_H phase	    
+	     panel1 = createPanel("");	//add panel 
+	     tp.addTab("Construction",ii,panel1,"Construction");
+	     panel1.add(tp0);
+		 tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	     tp.setTabPlacement(JTabbedPane.TOP);
+	     
+	     panel1_0 = createPanel("");
+	     tp0.addTab("Hull",ii,panel1_0,"Hull");
+	     panel1_0.setLayout(new GridBagLayout());
+	     GridBagConstraints c1 = new GridBagConstraints();
+	     JPanel[] j1_0 = new JPanel[C_H.length];
+	     JTextField[] field1_0 = new JTextField[C_H.length];
+	     JComboBox<String>[]  cb1_0	=	new JComboBox[C_H.length];
+	     ActionListener[] db1_0 = new ActionListener[C_H.length];
+	     
+	     for (i=0;i<C_H.length;i++){
+	    	 j1_0[i] = createsubPanel(String.valueOf(Design.length+i)+" "+C_H[i]);
+	    	 j1_0[i].setName(C_H[i]);
+		        c1.fill = GridBagConstraints.HORIZONTAL;
+			    c1.weightx = 2;
+			    //c1.weighty = 1;
+			    c1.gridx = i%3;
+			    c1.gridy = Math.round(i/3);
+			    if (j1_0[i].getName()==""){}
+			    else {panel1_0.add(j1_0[i], c1);}
+			    field1_0[i] = field;
+			    cb1_0[i]=cb;}
+	             	     
+//C_M phase
+	     panel1_1 = createPanel("");
+	     tp0.addTab("Machinery",ii,panel1_1,"Machinery");
+	     panel1_1.setLayout(new GridBagLayout());
+	     GridBagConstraints c2 = new GridBagConstraints();
+	     JPanel[] j1_1 = new JPanel[C_M.length];
+	     JTextField[] field1_1 = new JTextField[C_M.length];
+	     JComboBox<String>[]  cb1_1	=	new JComboBox[C_M.length];
+	     ActionListener[] db1_1 = new ActionListener[C_M.length];
+	     
+	     for (i=0;i<C_M.length;i++){
+	    	 j1_1[i] = createsubPanel(String.valueOf(Design.length+C_H.length+i)+" "+C_M[i]);
+	    	 j1_1[i].setName(C_M[i]);
+		        c2.fill = GridBagConstraints.HORIZONTAL;
+			    c2.weightx = 2;
+			    //c2.weighty = 1;
+			    c2.gridx = i%3;
+			    c2.gridy = Math.round(i/3);
+			    if (j1_1[i].getName()==""){}
+			    else {panel1_1.add(j1_1[i], c2);}
+			    field1_1[i] = field;
+			    cb1_1[i]=cb;}
+
+//C_A phase
+	     panel1_2 = createPanel("");
+	     tp0.addTab("Accommodation",ii,panel1_2,"Accommodation");
+	     panel1_2.setLayout(new GridBagLayout());
+	     GridBagConstraints c3 = new GridBagConstraints();
+	     JPanel[] j1_2 = new JPanel[C_A.length];
+	     JTextField[] field1_2 = new JTextField[C_A.length];
+	     JComboBox<String>[]  cb1_2	=	new JComboBox[C_A.length];
+	     ActionListener[] db1_2 = new ActionListener[C_A.length];
+
+	     for (i=0;i<C_A.length;i++){
+	    	 j1_2[i] = createsubPanel(String.valueOf(Design.length+C_H.length+C_M.length+i)+" "+C_A[i]);
+	    	 j1_2[i].setName(C_A[i]);
+		        c3.fill = GridBagConstraints.HORIZONTAL;
+			    c3.weightx = 2;
+			    //c3.weighty = 1;
+			    c3.gridx = i%3;
+			    c3.gridy = Math.round(i/3);
+			    if (j1_2[i].getName()==""){}
+			    else {panel1_2.add(j1_2[i], c3);}
+			    field1_2[i] = field;
+			    cb1_2[i]=cb;}
+	     
+//Operation phase	     
+	     panel2 = createPanel("");	//add panel 
+		 tp.addTab("Operation",ii,panel2,"Operation");
+	     tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	     tp.setTabPlacement(JTabbedPane.TOP);
+         panel2.setLayout(new GridBagLayout());
+	     GridBagConstraints c4 = new GridBagConstraints();
+	     JPanel[] j2 = new JPanel[Operation.length];
+	     JTextField[] field2 = new JTextField[Operation.length];
+	     JComboBox<String>[]  cb2	=	new JComboBox[Operation.length];
+	     ActionListener[] db2 = new ActionListener[Operation.length];
+
+	     for (i=0;i<Operation.length;i++){
+	    	 j2[i] = createsubPanel(String.valueOf(Design.length+C_H.length+C_M.length+C_A.length+i)+" "+Operation[i]);
+	    	 j2[i].setName(Operation[i]);
+		        c4.fill = GridBagConstraints.HORIZONTAL;
+			    c4.weightx = 2;
+			    //c4.weighty = 1;
+			    c4.gridx = i%3;
+			    c4.gridy = Math.round(i/3);
+			    if (j2[i].getName()==""){}
+			    else {panel2.add(j2[i], c4);}
+			    field2[i] = field;
+			    cb2[i]=cb;}
+	     
+//Maintenance phase	    
+	     panel3 = createPanel("");	//add panel 
+		 tp.addTab("Maintenance",ii,panel3,"Maintenance");
+	     tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	     tp.setTabPlacement(JTabbedPane.TOP);
+	     panel3.setLayout(new GridBagLayout());
+	     GridBagConstraints c5 = new GridBagConstraints();
+	     JPanel[] j3 = new JPanel[Maintenance.length];
+	     JTextField[] field3 = new JTextField[Maintenance.length];
+	     JComboBox<String>[]  cb3	=	new JComboBox[Maintenance.length];
+	     ActionListener[] db3 = new ActionListener[Maintenance.length];
+
+	     for (i=0;i<Maintenance.length;i++){
+	    	 j3[i] = createsubPanel(String.valueOf(Design.length+C_H.length+C_M.length+C_A.length+Operation.length+i)+" "+Maintenance[i]);
+	    	 j3[i].setName(Maintenance[i]);
+		        c5.fill = GridBagConstraints.HORIZONTAL;
+			    c5.weightx = 2;
+			    //c5.weighty = 1;
+			    c5.gridx = i%3;
+			    c5.gridy = Math.round(i/3);
+			    if (j3[i].getName()==""){}
+			    else {panel3.add(j3[i], c5);}
+			    field3[i] = field;
+			    cb3[i]=cb;}
+	     
+//Scrapping phase	    
+	     panel4 = createPanel("");	//add panel 
+		 tp.addTab("Scrapping",ii,panel4,"Scrapping");
+	     tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	     tp.setTabPlacement(JTabbedPane.TOP);
+	     panel4.setLayout(new GridBagLayout());
+	     GridBagConstraints c6 = new GridBagConstraints();
+	     JPanel[] j4 = new JPanel[Scrapping.length];
+	     JTextField[] field4 = new JTextField[Scrapping.length];
+	     JComboBox<String>[]  cb4	=	new JComboBox[Scrapping.length];
+	     ActionListener[] db4 = new ActionListener[Scrapping.length];
+
+	     for (i=0;i<Scrapping.length;i++){
+	    	 if(i>=Scrapping.length){
+	    		 break;
+	    	 }
+	    	 j4[i] = createsubPanel(String.valueOf(Design.length+C_H.length+C_M.length+C_A.length+Operation.length+Maintenance.length+i)+" "+Scrapping[i]);
+		      j4[i].setName(Scrapping[i]);
+		        c6.fill = GridBagConstraints.HORIZONTAL;
+			    c6.weightx = 2;
+			    //c6.weighty = 1;
+			    c6.gridx = i%3;
+			    c6.gridy = Math.round(i/3);
+			    if (j4[i].getName()==""){}
+			    else {panel4.add(j4[i], c6);}
+			    field4[i] = field;
+			    cb4[i]=cb;}
+	     
+//list all combobox in a array and add action for each combobox
+	     cb_m = new JComboBox[activity_length];
+	     for(int j=0; j<activity_length;j++)
+	     {
+	    	 if(j<Design.length){
+	    		 cb_m[j]=cb0[j];
+	    		 db0[j]=createActionListener(j);
+	    	 	 cb0[j].addActionListener(db0[j]);}
+	    	 
+	    	 if(Design.length<=j&&j<Design.length+C_H.length){
+	    		 cb_m[j]=cb1_0[j-Design.length];
+	    	 	 db1_0[j-Design.length]=createActionListener(j);
+	    	 	 cb1_0[j-Design.length].addActionListener(db1_0[j-Design.length]);}
+	    	 
+	    	 if(Design.length+C_H.length<=j&&j<Design.length+C_H.length+C_M.length){
+	    		 cb_m[j]=cb1_1[j-Design.length-C_H.length];
+	    		 db1_1[j-Design.length-C_H.length]=createActionListener(j);
+	    	 	 cb1_1[j-Design.length-C_H.length].addActionListener(db1_1[j-Design.length-C_H.length]);}
+	    	 
+	    	 if(Design.length+C_H.length+C_M.length<=j&&j<Design.length+C_H.length+C_M.length+C_A.length){
+	    		 cb_m[j]=cb1_2[j-Design.length-C_H.length-C_M.length];
+	    		 db1_2[j-Design.length-C_H.length-C_M.length]=createActionListener(j);
+	    	 	 cb1_2[j-Design.length-C_H.length-C_M.length].addActionListener(db1_2[j-Design.length-C_H.length-C_M.length]);}
+	    	 
+	    	 if(Design.length+C_H.length+C_M.length+C_A.length<=j&&j<Design.length+C_H.length+C_M.length+C_A.length+Operation.length){
+	    		 cb_m[j]=cb2[j-Design.length-C_H.length-C_M.length-C_A.length];
+	    		 db2[j-Design.length-C_H.length-C_M.length-C_A.length]=createActionListener(j);
+	    	 	 cb2[j-Design.length-C_H.length-C_M.length-C_A.length].addActionListener(db2[j-Design.length-C_H.length-C_M.length-C_A.length]);}
+	    	 
+	    	 if(Design.length+C_H.length+C_M.length+C_A.length+Operation.length<=j&&j<Design.length+C_H.length+C_M.length+C_A.length+Operation.length+Maintenance.length){
+	    		 cb_m[j]=cb3[j-Design.length-C_H.length-C_M.length-C_A.length-Operation.length];
+	    		 db3[j-Design.length-C_H.length-C_M.length-C_A.length-Operation.length]=createActionListener(j);
+	    	 	 cb3[j-Design.length-C_H.length-C_M.length-C_A.length-Operation.length].addActionListener(db3[j-Design.length-C_H.length-C_M.length-C_A.length-Operation.length]);}
+	    	 
+	    	 else if(Design.length+C_H.length+C_M.length+C_A.length+Operation.length+Maintenance.length<=j&&j<activity_length){
+	    		 cb_m[j]=cb4[j-Design.length-C_H.length-C_M.length-C_A.length-Operation.length-Maintenance.length];
+	    		 db4[j-Design.length-C_H.length-C_M.length-C_A.length-Operation.length-Maintenance.length]=createActionListener(j);
+	    	 	 cb4[j-Design.length-C_H.length-C_M.length-C_A.length-Operation.length-Maintenance.length].addActionListener(db4[j-Design.length-C_H.length-C_M.length-C_A.length-Operation.length-Maintenance.length]);}
+	     }
+		
+// 
+//Report	    
+	     panel5 = createPanel("");	//add panel 
+		 tp.addTab("Report",ii,panel5,"Report");
+	     tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	     tp.setTabPlacement(JTabbedPane.TOP);
+	     panel5.setLayout(new BoxLayout(panel5, BoxLayout.PAGE_AXIS));
+	     setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+	     
+	     JTextPane textReport = new JTextPane();
+	     textReport.setAlignmentX(Component.CENTER_ALIGNMENT);
+	     JScrollPane sp = new JScrollPane(textReport);
+	     sp.setPreferredSize(new Dimension(400,200));
+//	     areaReport.setLineWrap(true);
+//	     areaReport.setAutoscrolls(true);
+//		 textReport.setPreferredSize(new Dimension (200,200));
+  
+	     panel5.add(sp);
+	     
+//add button	     
+	     JButton calcButton = new JButton("Calculate");
+	     calcButton.setName("calcButton");
+	     calcButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+	     panel5.add(calcButton);
+	     
+//	     JButton saveButton = new JButton("Save");
+//	     saveButton.setName("saveButton");
+//	     saveButton.setAlignmentX(Component.BOTTOM_ALIGNMENT);
+//	     panel5.add(saveButton);
+//	     
+//	     JButton compButton = new JButton("Compare");
+//	     compButton.setName("compButton");
+//	     compButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+//	     panel5.add(compButton);
+
+//add action for clicking button
+	     //calc
+	     calcButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//include all the equaitons here 
+//				Parameter_C_System CS1 = new Parameter_C_System();
+//				Parameter_C_Material CM1 = new Parameter_C_Material();
+//				Parameter_O O1 = new Parameter_O();
+//				Parameter_S S1 = new Parameter_S();
+				double PV = Double.parseDouble(field0[2].getText()); //0 means not using present value; 1 means using;
+				double Life_span = Double.parseDouble(field0[1].getText()); //Life span of target (year)
+				double Interest = Double.parseDouble(field0[3].getText()); //Interest rate (100%)
+				String case_name = field0[0].getText();
+//uncertainty level
+				double UL= Double.parseDouble(field0[4].getText());
+				double CoTL = Double.parseDouble(field0[5].getText());
+				
+				if(PV==0){System.out.println("Present value is not applied");}
+				else{System.out.println("Present value is applied");}
+				
+				if(UL==0){System.out.println("Average value is applied");
+				for(int i = 0; i<data_length; i++){
+					for(int j = 0; j<activity_length; j++){
+						data_m[i][j]=data_m1[i][j];			}}}
+				if(UL==1){System.out.println("Minimum value is applied");
+				for(int i = 0; i<data_length; i++){
+					for(int j = 0; j<activity_length; j++){
+						data_m[i][j]=data_m2[i][j];			}}}
+				if(UL==2){System.out.println("Maximum value is applied");
+				for(int i = 0; i<data_length; i++){
+					for(int j = 0; j<activity_length; j++){
+						data_m[i][j]=data_m3[i][j];			}}}
+				
+			//Construction
+				//System: ME, MG, Boiler...
+				Parameter_C_System CS1 = new Parameter_C_System();
+				
+				CS1.	Number	=	Double.parseDouble(data_m[1][12])	; //Number of items
+				CS1.	Weight	=	Double.parseDouble(data_m[2][12])	; //Weight of item (ton)
+				CS1.	Price	=	Double.parseDouble(data_m[3][12])	; //Item price (Euro/ton)
+						
+				
+				CS1.	Transportation_distance	=	Double.parseDouble(data_m[1][14])	; //Distance of item transportation (km)
+				CS1.	Transportation_price	=	Double.parseDouble(data_m[2][14])	; //Transportation price per km (Euro/km)
+				CS1.	Transportation_SFOC	=	Double.parseDouble(data_m[3][14])	; //Transportation fuel consumption (ton/km)
+				CS1.	Transportation_fuel_price	=	Double.parseDouble(data_m[4][14])	; //Fuel price of transportation (Euro/ton)
+				CS1.	Installation_energy_price	=	Double.parseDouble(data_m[1][16])	; //Energy price (Euro/unit)
+
+				CS1. Spec_GWP_Trans 	=	Double.parseDouble(data_m[5][14])	; //Specific GWP of transportation (ton CO2e/ ton fuel used for transportation)
+				CS1. Spec_AP_Trans 	=	Double.parseDouble(data_m[6][14])	; //Specific AP of transportation (ton SO2e/ ton fuel used for transportation)
+				CS1. Spec_EP_Trans 	=	Double.parseDouble(data_m[7][14])	; //Specific EP of transportation (ton PO4e/ ton fuel used for transportation)
+				CS1. Spec_POCP_Trans 	=	Double.parseDouble(data_m[8][14])	; //Specific POCP of transportation (ton C2H6e/ ton fuel used for transportation)
+							
+				CS1. Spec_GWP_E 	=	Double.parseDouble(data_m[2][16])	; //Specific GWP of energy consumption (ton CO2e/ MJ energy used)
+				CS1. Spec_AP_E 	=	Double.parseDouble( data_m[3][16]); //Specific AP of energy consumption (ton SO2e/ MJ energy used)
+				CS1. Spec_EP_E 	=	Double.parseDouble( data_m[4][16])	; //Specific EP of energy consumption (ton PO4e/ MJ energy used)
+				CS1. Spec_POCP_E 	=	Double.parseDouble(data_m[5][16])	; //Specific POCP of energy consumption (ton C2H6e/ MJ energy used)
+				
+				
+				CS1.H = 7;
+				CS1.F[0]=Double.parseDouble(data_m1[9][12]);
+				CS1.F[1]=Double.parseDouble(data_m1[10][12]);
+				CS1.F[2]=Double.parseDouble(data_m1[11][12]);
+				CS1.F[3]=Double.parseDouble(data_m1[12][12]);
+				CS1.F[4]=Double.parseDouble(data_m1[13][12]);
+				CS1.F[5]=Double.parseDouble(data_m1[14][12]);
+				CS1.F[6]=Double.parseDouble(data_m1[15][12]);
+				
+				CS1.C[0]=Double.parseDouble(data_m2[9][12]);
+				CS1.C[1]=Double.parseDouble(data_m2[10][12]);
+				CS1.C[2]=Double.parseDouble(data_m2[11][12]);
+				CS1.C[3]=Double.parseDouble(data_m2[12][12]);
+				CS1.C[4]=Double.parseDouble(data_m2[13][12]);
+				CS1.C[5]=Double.parseDouble(data_m2[14][12]);
+				CS1.C[6]=Double.parseDouble(data_m2[15][12]);
+				
+				CS1.M[0]=Double.parseDouble(data_m3[9][12]);
+				CS1.M[1]=Double.parseDouble(data_m3[10][12]);
+				CS1.M[2]=Double.parseDouble(data_m3[11][12]);
+				CS1.M[3]=Double.parseDouble(data_m3[12][12]);
+				CS1.M[4]=Double.parseDouble(data_m3[13][12]);
+				CS1.M[5]=Double.parseDouble(data_m3[14][12]);
+				CS1.M[6]=Double.parseDouble(data_m3[15][12]);
+				CS1.CoTL =CoTL;
+				CS1.run(); //Run the calculation
+
+	Parameter_C_System CS2 = new Parameter_C_System();
+				
+				CS2.	Number	=	Double.parseDouble(data_m[1][13])	; //Number of items
+				CS2.	Weight	=	Double.parseDouble(data_m[2][13])	; //Weight of item (ton)
+				CS2.	Price	=	Double.parseDouble(data_m[3][13])	; //Item price (Euro/ton)
+						
+				
+				CS2.	Transportation_distance	=	Double.parseDouble(data_m[1][15])	; //Distance of item transportation (km)
+				CS2.	Transportation_price	=	Double.parseDouble(data_m[2][15])	; //Transportation price per km (Euro/km)
+				CS2.	Transportation_SFOC	=	Double.parseDouble(data_m[3][15])	; //Transportation fuel consumption (ton/km)
+				CS2.	Transportation_fuel_price	=	Double.parseDouble(data_m[4][15])	; //Fuel price of transportation (Euro/ton)
+				CS2.	Installation_energy_price	=	Double.parseDouble(data_m[1][16])	; //Energy price (Euro/unit)
+
+				CS2. Spec_GWP_Trans 	=	Double.parseDouble(data_m[5][15])	; //Specific GWP of transportation (ton CO2e/ ton fuel used for transportation)
+				CS2. Spec_AP_Trans 	=	Double.parseDouble(data_m[6][15])	; //Specific AP of transportation (ton SO2e/ ton fuel used for transportation)
+				CS2. Spec_EP_Trans 	=	Double.parseDouble(data_m[7][15])	; //Specific EP of transportation (ton PO4e/ ton fuel used for transportation)
+				CS2. Spec_POCP_Trans 	=	Double.parseDouble(data_m[8][15])	; //Specific POCP of transportation (ton C2H6e/ ton fuel used for transportation)
+							
+				CS2. Spec_GWP_E 	=	Double.parseDouble(data_m[2][16])	; //Specific GWP of energy consumption (ton CO2e/ MJ energy used)
+				CS2. Spec_AP_E 	=	Double.parseDouble( data_m[3][16]); //Specific AP of energy consumption (ton SO2e/ MJ energy used)
+				CS2. Spec_EP_E 	=	Double.parseDouble( data_m[4][16])	; //Specific EP of energy consumption (ton PO4e/ MJ energy used)
+				CS2. Spec_POCP_E 	=	Double.parseDouble(data_m[5][16])	; //Specific POCP of energy consumption (ton C2H6e/ MJ energy used)
+				
+				
+				CS2.H = 7;
+				CS2.F[0]=Double.parseDouble(data_m1[12][13]);
+				CS2.F[1]=Double.parseDouble(data_m1[13][13]);
+				CS2.F[2]=Double.parseDouble(data_m1[14][13]);
+				CS2.F[3]=Double.parseDouble(data_m1[15][13]);
+				CS2.F[4]=Double.parseDouble(data_m1[16][13]);
+				CS2.F[5]=Double.parseDouble(data_m1[17][13]);
+				CS2.F[6]=Double.parseDouble(data_m1[18][13]);
+				
+				CS2.C[0]=Double.parseDouble(data_m2[12][13]);
+				CS2.C[1]=Double.parseDouble(data_m2[13][13]);
+				CS2.C[2]=Double.parseDouble(data_m2[14][13]);
+				CS2.C[3]=Double.parseDouble(data_m2[15][13]);
+				CS2.C[4]=Double.parseDouble(data_m2[16][13]);
+				CS2.C[5]=Double.parseDouble(data_m2[17][13]);
+				CS2.C[6]=Double.parseDouble(data_m2[18][13]);
+				
+				CS2.M[0]=Double.parseDouble(data_m3[12][13]);
+				CS2.M[1]=Double.parseDouble(data_m3[13][13]);
+				CS2.M[2]=Double.parseDouble(data_m3[14][13]);
+				CS2.M[3]=Double.parseDouble(data_m3[15][13]);
+				CS2.M[4]=Double.parseDouble(data_m3[16][13]);
+				CS2.M[5]=Double.parseDouble(data_m3[17][13]);
+				CS2.M[6]=Double.parseDouble(data_m3[18][13]);
+				CS2.CoTL =CoTL;
+				CS2.run(); //Run the calculation
+				
+				
+				
+				
+				
+				//Material: steel, aluminium, composite material...
+				Parameter_C_Material CM1 = new Parameter_C_Material();
+//				
+//				CM1.	Number	=	3.00	; //Number of purchase
+//				CM1.	Weight	=	1.33	; //Weight of material (ton)	
+//				CM1.	Price	=	10000.00	; //Material price (Euro/ton)
+//				CM1.	Transportation_distance	=	1000.00	; //Distance of material transportation (km)
+//				CM1.	Transportation_price	=	1.62	; //Transportation price per km (Euro/km)
+//				CM1.	Transportation_SFOC	=	1.64E-03	; //Transportation specification fuel consumption (ton/km)
+//				CM1.	Transportation_fuel_price	=	1350.00	; //Fuel price of transportation (Euro/ton)
+//				CM1.	Processing_energy_price	=	0.01	; //Energy price (Euro/unit)
+//
+//				CM1. Spec_GWP_Trans 	=	0.005227659	; //Specific GWP of transportation (ton CO2e/ ton fuel used for transportation)
+//				CM1. Spec_AP_Trans 	=	1.20711E-06	; //Specific AP of transportation (ton SO2e/ ton fuel used for transportation)
+//				CM1. Spec_EP_Trans 	=	2.93753E-07	; //Specific EP of transportation (ton PO4e/ ton fuel used for transportation)
+//				CM1. Spec_POCP_Trans 	=	1.87014E-07	; //Specific POCP of transportation (ton C2H6e/ ton fuel used for transportation)
+//							
+//				CM1. Spec_GWP_E 	=	0.002341819	; //Specific GWP of energy consumption (ton CO2e/ MJ energy used)
+//				CM1. Spec_AP_E 	=	5.79774E-06	; //Specific AP of energy consumption (ton SO2e/ MJ energy used)
+//				CM1. Spec_EP_E 	=	4.69704E-07	; //Specific EP of energy consumption (ton PO4e/ MJ energy used)
+//				CM1. Spec_POCP_E 	=	5.11746E-07	; //Specific POCP of energy consumption (ton C2H6e/ MJ energy used)
+//				
+				CM1.run(); //Run the calculation
+				
+				//Operation
+				Parameter_O O1 = new Parameter_O();
+				O1.Number 	=	CS1.Number;
+				O1.	SFOC	=	Double.parseDouble(data_m[5][12])	; //Specific fuel oil consumption (g/kWh)
+				O1.	Ohour	=	Double.parseDouble(data_m[1][22]); //Operation hours (h)
+				O1.	Eload	=	Double.parseDouble(data_m[4][12])	; //Power (kW)
+				O1.	SLOC	=	Double.parseDouble(data_m[6][12])	; //Specific lubricating oil consumption (g/kWh)
+				O1.	Fuel_price	=	Double.parseDouble(data_m[1][23])	; //Fuel oil price (Euro/ton)
+				O1.C_Factor = Double.parseDouble(data_m[6][23]); 	//carbon content
+				O1.S_Factor = Double.parseDouble(data_m[7][23]);	//sulfer content
+				O1.	LO_price	=	Double.parseDouble(data_m[1][24])	; //Lub oil price (Euro/ton)
+				O1.	Transportation_price	=	Double.parseDouble(data_m[2][25])	; //Transportation price per km (Euro/km)
+				O1.	Transportation_SFOC	=	Double.parseDouble(data_m[3][25])	; //Transportation specification fuel consumption (ton/km)
+				O1.	Transportation_fuel_price	=	Double.parseDouble(data_m[4][25])	; //Fuel price of transportation (Euro/ton)
+				O1.	Transportation_distance	=	Double.parseDouble(data_m[1][25])	; //Distance of material transportation (km)
+				O1.	Life_span	=	Life_span	;
+				O1.	Interest	=	Interest	;
+				O1.PV 	=PV;
+				
+				//System.out.println(O1.Cost_O);
+				//System.out.println(O1.Transportation_distance);
+				
+				//Specific GWP of activity (ton CO2e/ ton fuel used for activity)
+				//Specific AP of activity (ton SO2e/ ton fuel used for activity)
+				//Specific EP of activity (ton PO4e/ ton fuel used for activity)
+				//Specific POCP of activity (ton C2H6e/ ton fuel used for activity)
+				
+				O1. Spec_GWP_Trans 	=	Double.parseDouble(data_m[5][25])	;
+				O1. Spec_AP_Trans 	=	Double.parseDouble(data_m[6][25])	;
+				O1. Spec_EP_Trans 	=	Double.parseDouble(data_m[7][25])	;
+				O1. Spec_POCP_Trans =	Double.parseDouble(data_m[8][25])	;
+							
+							
+				O1. Spec_GWP_FO 	=	Double.parseDouble(data_m[2][23])		;
+				O1. Spec_AP_FO 	=	Double.parseDouble(data_m[3][23])			;
+				O1. Spec_EP_FO 	=	Double.parseDouble(data_m[4][23])			;
+				O1. Spec_POCP_FO 	=	Double.parseDouble(data_m[5][23])		;
+
+				O1.run(); //Run the calculation
+	
+			//Scrapping
+				Parameter_S S1 = new Parameter_S();
+
+				S1.	Number	=	CS1.Number	; //Number of item for scrapping
+				S1.	Weight	=	CS1.Weight	; //Weight of item (ton)
+				S1.	Price	=	Double.parseDouble(data_m[1][31])	; //Price of scrapping (Euro/ton)
+				S1.	Transportation_distance	=	Double.parseDouble(data_m[1][32])	; //Distance of material transportation (km)
+				S1.	Transportation_price	=	Double.parseDouble(data_m[2][32])	; //Transportation price per km (Euro/km)
+				S1.	Transportation_SFOC	=	Double.parseDouble(data_m[3][32]); //Transportation specification fuel consumption (ton/km)
+				S1.	Transportation_fuel_price	=	Double.parseDouble(data_m[4][32])	; //Fuel price of transportation (Euro/ton)
+				S1.	Electricity_price	=	Double.parseDouble(data_m[1][33])	;  //Fuel oil price (Euro/ton) natural gas
+				
+				S1.Fuel_price = Double.parseDouble(data_m[1][33]);
+				S1.Cutting_energy_meter=Double.parseDouble(data_m[1][34]);
+				S1.Cutting_length = Double.parseDouble(data_m[4][34]);
+				S1.Cutting_M_price = Double.parseDouble(data_m[3][34]);
+				S1.Cutting_material =Double.parseDouble(data_m[2][34]);
+				
+				S1.	Life_span	=	Life_span	;
+				S1.	Interest	=	Interest	;
+				S1.	PV 	=PV;
+				
+				//Specific GWP of activity (ton CO2e/ ton fuel used for activity)
+				//Specific AP of activity (ton SO2e/ ton fuel used for activity)
+				//Specific EP of activity (ton PO4e/ ton fuel used for activity)
+				//Specific POCP of activity (ton C2H6e/ ton fuel used for activity)
+				
+				S1. Spec_GWP_Trans 	=	Double.parseDouble(data_m[5][32])	;
+				S1. Spec_AP_Trans 	=	Double.parseDouble(data_m[6][32])	;
+				S1. Spec_EP_Trans 	=	Double.parseDouble(data_m[7][32])	;
+				S1. Spec_POCP_Trans 	=	Double.parseDouble(data_m[8][32])	;
+							
+				
+				S1. Spec_GWP_E 	=	Double.parseDouble(data_m[2][33])	;
+				S1. Spec_AP_E 	=	Double.parseDouble(data_m[3][33])	;
+				S1. Spec_EP_E 	=	Double.parseDouble(data_m[4][33])	;
+				S1. Spec_POCP_E =	Double.parseDouble(data_m[5][33])	;
+				
+				
+				
+				
+				S1.run(); //Run the calculation
+
+				Parameter_S S2 = new Parameter_S();
+
+				S2.	Number	=	CS2.Number	; //Number of item for scrapping
+				S2.	Weight	=	CS2.Weight	; //Weight of item (ton)
+				S2.	Price	=	Double.parseDouble(data_m[1][31])	; //Price of scrapping (Euro/ton)
+				S2.	Transportation_distance	=	Double.parseDouble(data_m[1][32])	; //Distance of material transportation (km)
+				S2.	Transportation_price	=	Double.parseDouble(data_m[2][32])	; //Transportation price per km (Euro/km)
+				S2.	Transportation_SFOC	=	Double.parseDouble(data_m[3][32]); //Transportation specification fuel consumption (ton/km)
+				S2.	Transportation_fuel_price	=	Double.parseDouble(data_m[4][32])	; //Fuel price of transportation (Euro/ton)
+				S2.	Electricity_price	=	Double.parseDouble(data_m[1][33])	;  //Fuel oil price (Euro/ton) natural gas
+				
+				S2.Fuel_price = Double.parseDouble(data_m[1][33]);
+				S2.Cutting_energy_meter=Double.parseDouble(data_m[1][34]);
+				S2.Cutting_length = Double.parseDouble(data_m[4][34]);
+				S2.Cutting_M_price = Double.parseDouble(data_m[3][34]);
+				S2.Cutting_material =Double.parseDouble(data_m[2][34]);
+				
+				S2.	Life_span	=	Life_span	;
+				S2.	Interest	=	Interest	;
+				S2.	PV 	=PV;
+				
+				//Specific GWP of activity (ton CO2e/ ton fuel used for activity)
+				//Specific AP of activity (ton SO2e/ ton fuel used for activity)
+				//Specific EP of activity (ton PO4e/ ton fuel used for activity)
+				//Specific POCP of activity (ton C2H6e/ ton fuel used for activity)
+				
+				S2. Spec_GWP_Trans 	=	Double.parseDouble(data_m[5][32])	;
+				S2. Spec_AP_Trans 	=	Double.parseDouble(data_m[6][32])	;
+				S2. Spec_EP_Trans 	=	Double.parseDouble(data_m[7][32])	;
+				S2. Spec_POCP_Trans 	=	Double.parseDouble(data_m[8][32])	;
+							
+				
+				S2. Spec_GWP_E 	=	Double.parseDouble(data_m[2][33])	;
+				S2. Spec_AP_E 	=	Double.parseDouble(data_m[3][33])	;
+				S2. Spec_EP_E 	=	Double.parseDouble(data_m[4][33])	;
+				S2. Spec_POCP_E =	Double.parseDouble(data_m[5][33])	;
+				
+				
+				
+				
+				S2.run(); //Run the calculation
+			//Results	
+				double Total_cost = CS1.Cost_C_System + CS2.Cost_C_System+ O1.Cost_O+S1.Cost_S+S2.Cost_S; //Total cost (Euro)  	CM1.Cost_C_Material+ 
+				double Total_GWP = CS1.GWP+CS2.GWP+O1.GWP+S1.GWP+S2.GWP; //Total GWP    							CM1.GWP+
+				double Total_AP = CS1.AP+CS2.AP+O1.AP+S1.AP+S2.AP; //Total AP									CM1.AP+
+				double Total_EP = CS1.EP+CS2.EP+O1.EP+S1.EP+S2.EP; //Total EP									CM1.EP+
+				double Total_POCP = CS1.POCP+CS2.POCP+O1.POCP+S1.POCP+S2.POCP; //Total POCP							CM1.POCP+
+				double Total_RA = CS1.RA+ CS2.RA; //Total RA
+				double Total_CRA = Total_RA/1000*CoTL;
+				
+				//Outputs print
+				System.out.println("The total Life Cycle Cost is : " + Total_cost + "Euro");
+				System.out.println("The total GWP is :" + Total_GWP + "ton CO2e"); 
+				System.out.println("The total AP is :" + Total_AP + "ton SO2e"); 
+				System.out.println("The total EP is :" + Total_EP + "ton PO4e"); 
+				System.out.println("The total POCP is :" + Total_POCP + "ton C2H6e"); 	
+				System.out.println("The total RA is :" + Total_RA + "RPN");
+				System.out.println("The total Risk Cost is :" + Total_CRA + "Euro");
+				
+
+/*design*/		double sum0 = 0;				
+/*C_H*/			double sum1 = 0;
+/*C_M*/			double sum2 = CS1.Cost_C_System+CS2.Cost_C_System ; //+ CM1.Cost_C_Material
+/*C_A*/			double sum3 = 0;
+/*O*/			double sum4 = O1.Cost_O;
+/*M*/			double sum5 = 0;
+/*S*/			double sum6 = S1.Cost_S+S2.Cost_S;
+/*Sum*/			double sum = Total_cost;
+			     
+/*design*/		double GWP0 = 0;				
+/*C_H*/			double GWP1 = 0;
+/*C_M*/			double GWP2 = CS1.GWP + CS2.GWP; //+ CM1.Cost_C_Material
+/*C_A*/			double GWP3 = 0;
+/*O*/			double GWP4 = O1.GWP;
+/*M*/			double GWP5 = 0;
+/*S*/			double GWP6 = S1.GWP+S2.GWP;
+/*Sum*/			double GWP = Total_GWP;
+				double P_GWP = 24; //$ per ton
+
+/*design*/		double AP0 = 0;				
+/*C_H*/			double AP1 = 0;
+/*C_M*/			double AP2 = CS1.AP +CS2.AP; //+ CM1.Cost_C_Material
+/*C_A*/			double AP3 = 0;
+/*O*/			double AP4 = O1.AP;
+/*M*/			double AP5 = 0;
+/*S*/			double AP6 = S1.AP +S2.AP;
+/*AP*/			double AP = Total_AP;
+				double P_AP = 7788;
+
+/*design*/		double EP0 = 0;				
+/*C_H*/			double EP1 = 0;
+/*C_M*/			double EP2 = CS1.EP +CS2.EP; //+ CM1.Cost_C_Material
+/*C_A*/			double EP3 = 0;
+/*O*/			double EP4 = O1.EP;
+/*M*/			double EP5 = 0;
+/*S*/			double EP6 = S1.EP +S2.EP;
+/*EP*/			double EP = Total_EP;
+				double P_EP = 0;
+
+/*design*/		double POCP0 = 0;				
+/*C_H*/			double POCP1 = 0;
+/*C_M*/			double POCP2 = CS1.POCP +CS2.POCP; //+ CM1.Cost_C_Material
+/*C_A*/			double POCP3 = 0;
+/*O*/			double POCP4 = O1.POCP;
+/*M*/			double POCP5 = 0;
+/*S*/			double POCP6 = S1.POCP +S2.POCP;
+/*POCP*/		double POCP = Total_POCP;
+				double P_POCP = 0;
+
+/*design*/		double RA0 = 0;				
+/*C_H*/			double RA1 = 0;
+/*C_M*/			double RA2 = CS1.RA +CS2.RA; //+ CM1.Cost_C_Material
+/*C_A*/			double RA3 = 0;
+/*O*/			double RA4 = 0;
+/*M*/			double RA5 = 0;
+/*S*/			double RA6 = 0;
+/*RA*/			double RA = Total_RA;
+
+				q.add(String.valueOf(sum0));
+				q.add(String.valueOf(sum1));
+				q.add(String.valueOf(sum2));
+				q.add(String.valueOf(sum3));
+				q.add(String.valueOf(sum4));
+				q.add(String.valueOf(sum5));
+				q.add(String.valueOf(sum6));
+				q.add(String.valueOf(sum));
+				
+				
+				
+			     textReport.setText( 	"The construction cost of engine is " + sum2 + "Euro"+"\n"+
+			    		 				"The operation cost of engine is " + sum4 + "Euro"+"\n"+
+			    		 				"The scrapping cost of engine is " + sum6 + "Euro"+"\n"+
+			    		 				"The total cost of engine is " + sum + "Euro"+"\n"+
+			    		 				
+										"The construction GWP of engine is " + GWP2 +"ton CO2 e"+"\n"+
+										"The operation GWP of engine is " + GWP4 +"ton CO2 e"+"\n"+
+										"The scrapping GWP of engine is " + GWP6 +"ton CO2 e"+"\n"+
+										"The total GWP of engine is " + GWP +"ton CO2 e"+"\n"+
+										
+										"The construction AP of engine is " + AP2 +"ton SO2 e"+"\n"+
+										"The operation AP of engine is " + AP4 +"ton SO2 e"+"\n"+
+										"The scrapping AP of engine is " + AP6 +"ton SO2 e"+"\n"+
+										"The total AP of engine is " + AP +"ton SO2 e"+"\n"+
+																			
+										"The construction EP of engine is " + EP2 +"ton PO4 e"+"\n"+
+										"The operation EP of engine is " + EP4 +"ton PO4 e"+"\n"+
+										"The scrapping EP of engine is " + EP6 +"ton PO4 e"+"\n"+
+										"The total EP of engine is " + EP +"ton PO4 e"+"\n"+
+										
+										"The construction POCP of engine is " + POCP2 +"ton C2H6 e"+"\n"+
+										"The operation POCP of engine is " + POCP4 +"ton C2H6 e"+"\n"+
+										"The scrapping POCP of engine is " + POCP6 +"ton C2H6 e"+"\n"+
+										"The total POCP of engine is " + POCP +"ton C2H6 e"+"\n"+
+										
+										"The construction RPN of engine is " + RA2 +"RPN"+"\n"+
+										"The operation RPN of engine is " + RA4 +"RPN"+"\n"+
+										"The scrapping RPN of engine is " + RA6 +"RPN"+"\n"+
+										"The total RPN of engine is " + RA +"RPN"+"\n"+	
+										
+			    		 	"The Life Cycle Cost is "+ Total_cost +"Euro"+"\n"+
+			    		 	"The GWP is"+ Total_GWP +"ton CO2 e"+"\n"+
+			    		 	"The AP is " + Total_AP +"ton SO2 e"+"\n"+
+			    		 	"The EP is " + Total_EP +"ton PO4 e"+"\n"+
+			    		 	"The POCP is " + Total_POCP +"ton C2H6 e"+"\n"+
+			    		 	"The RPN is " + Total_RA +"RPN"+"\n"+
+			    		 	"The Risk Cost is " + Total_CRA +"Euro"+"\n"
+			    		 );
+////generate a piechart
+//			     ArrayList<Segment> values_1 = new ArrayList<Segment>();
+//			     values_1.add(new Segment(sum0/sum*100, Phase[0], Color.RED));
+//			     values_1.add(new Segment(sum1/sum*100, Phase[1], Color.ORANGE));
+//			     values_1.add(new Segment(sum2/sum*100, Phase[2], Color.YELLOW));
+//			     values_1.add(new Segment(sum3/sum*100, Phase[3], Color.GREEN));
+//			     values_1.add(new Segment(sum4/sum*100, Phase[4], Color.CYAN));
+//			     values_1.add(new Segment(sum5/sum*100, Phase[5], Color.BLUE));
+//			     values_1.add(new Segment(sum6/sum*100, Phase[6], Color.PINK));
+//			     PieChart pieChart = new PieChart(values_1, "Pie Chart");
+//			     pieChart.setAlignmentX(Component.CENTER_ALIGNMENT);
+//			     pieChart.setPreferredSize(new Dimension(800, 600));
+//			     
+//			     panel_chart1 = new JPanel();
+//			     panel_chart1.add(pieChart);
+//			     //create a window for piechart
+//			     frame1 = new JFrame("Pie Charts");
+//			     //frame1.setName("Charts");
+//			     frame1.setLayout(new BorderLayout());
+//			     frame1.add(panel_chart1,BorderLayout.WEST);
+//			     frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//			     frame1.setSize(new Dimension(820, 620));
+//			     frame1.setResizable(true);
+//			     panel_chart1.setPreferredSize(new Dimension(frame1.getWidth()-20, frame1.getHeight()-200));
+//			     frame1.pack();
+//			     frame1.setVisible(true);
+			     
+			 //add XY charts	     
+			     DefaultCategoryDataset dataset1 = 
+			    	      new DefaultCategoryDataset( );
+			      dataset1.addValue( sum2 , "Construction" , case_name );        
+			      dataset1.addValue( sum4 , "Operation" , case_name );        
+			      dataset1.addValue( sum6 , "Scrapping" , case_name ); 
+			      dataset1.addValue( sum , "Total" , case_name );     
+		
+			  // Generate the graph
+			     JFreeChart chart1 = ChartFactory.createBarChart(
+			     "Life Cycle Cost", // Title
+			     "Life Stages", // x-axis Label
+			     "Cost ($)", // y-axis Label
+			     dataset1, // Dataset
+			     PlotOrientation.HORIZONTAL, // Plot Orientation
+			     true, // Show Legend
+			     true, // Use tooltips
+			     false // Configure chart to generate URLs?
+			  );
+			     ChartPanel CP1 = new ChartPanel(chart1);
+			     
+			     panel_chart1 = new JPanel();
+			     panel_chart1.add(CP1);
+			     //create a window for piechart
+			     frame1 = new JFrame("Life Cycle Cost");
+			     frame1.setLayout(new BorderLayout());
+			     frame1.add(panel_chart1, BorderLayout.WEST);
+			     frame1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			     frame1.setSize(new Dimension(820, 620));
+			     frame1.setResizable(true);
+			     panel_chart1.setPreferredSize(new Dimension(frame1.getWidth()-120, frame1.getHeight()-150));
+			     frame1.pack();
+			     frame1.setVisible(true);
+			     
+			   //add XY charts 2	     
+			     DefaultCategoryDataset dataset2 = 
+			    	      new DefaultCategoryDataset( );
+			      dataset2.addValue( GWP2 , "Construction" , case_name );        
+			      dataset2.addValue( GWP4 , "Operation" , case_name );        
+			      dataset2.addValue( GWP6 , "Scrapping" , case_name ); 
+			      dataset2.addValue( GWP , "Total" , case_name );     
+		
+			  // Generate the graph
+			     JFreeChart chart2 = ChartFactory.createBarChart(
+			     "Global Warming Potential", // Title
+			     "Life Stages", // x-axis Label
+			     "GWP (ton CO2e)", // y-axis Label
+			     dataset2, // Dataset
+			     PlotOrientation.HORIZONTAL, // Plot Orientation
+			     true, // Show Legend
+			     true, // Use tooltips
+			     false // Configure chart to generate URLs?
+			  );
+			     ChartPanel CP2 = new ChartPanel(chart2);
+			     
+			     panel_chart2 = new JPanel();
+			     panel_chart2.add(CP2);
+			     //create a window for piechart
+			     frame2 = new JFrame("Global Warming Potential");
+			     frame2.setLayout(new BorderLayout());
+			     frame2.add(panel_chart2, BorderLayout.WEST);
+			     frame2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			     frame2.setSize(new Dimension(820, 620));
+			     frame2.setResizable(true);
+			     panel_chart2.setPreferredSize(new Dimension(frame2.getWidth()-120, frame2.getHeight()-150));
+			     frame2.pack();
+			     frame2.setVisible(true);
+			     
+			   //add XY charts 3	     			
+			     DefaultCategoryDataset dataset3 = 	
+			    	      new DefaultCategoryDataset( );
+			      dataset3.addValue( AP2 , "Construction" , case_name );        	
+			      dataset3.addValue( AP4 , "Operation" , case_name );        	
+			      dataset3.addValue( AP6 , "Scrapping" , case_name ); 	
+			      dataset3.addValue( AP , "Total" , case_name );     	
+				
+			  // Generate the graph	
+			     JFreeChart chart3 = ChartFactory.createBarChart(	
+			     "Acidification Potential", // Title	
+			     "Life Stages", // x-axis Label	
+			     "AP (ton SO2e)", // y-axis Label	
+			     dataset3, // Dataset	
+			     PlotOrientation.HORIZONTAL, // Plot Orientation	
+			     true, // Show Legend	
+			     true, // Use tooltips	
+			     false // Configure chart to generate URLs?	
+			  );	
+			     ChartPanel CP3 = new ChartPanel(chart3);	
+			     	
+			     panel_chart3 = new JPanel();	
+			     panel_chart3.add(CP3);	
+			     //create a window for piechart	
+			     frame3 = new JFrame("Acidification Potential");	
+			     frame3.setLayout(new BorderLayout());	
+			     frame3.add(panel_chart3, BorderLayout.WEST);	
+			     frame3.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
+			     frame3.setSize(new Dimension(800, 600));	
+			     frame3.setResizable(true);	
+			     panel_chart3.setPreferredSize(new Dimension(frame3.getWidth()-120, frame3.getHeight()-150));	
+			     frame3.pack();	
+			     frame3.setVisible(true);	
+
+			   //add XY charts 4	     			
+			     DefaultCategoryDataset dataset4 = 	
+			    	      new DefaultCategoryDataset( );
+			      dataset4.addValue( EP2 , "Construction" , case_name );        	
+			      dataset4.addValue( EP4 , "Operation" , case_name );        	
+			      dataset4.addValue( EP6 , "Scrapping" , case_name ); 	
+			      dataset4.addValue( EP , "Total" , case_name );     	
+				
+			  // Generate the graph	
+			     JFreeChart chart4 = ChartFactory.createBarChart(	
+			     "Eutrophication Potential", // Title	
+			     "Life Stages", // x-axis Label	
+			     "EP (ton PO4e)", // y-axis Label	
+			     dataset4, // Dataset	
+			     PlotOrientation.HORIZONTAL, // Plot Orientation	
+			     true, // Show Legend	
+			     true, // Use tooltips	
+			     false // Configure chart to generate URLs?	
+			  );	
+			     ChartPanel CP4 = new ChartPanel(chart4);	
+			     	
+			     panel_chart4 = new JPanel();	
+			     panel_chart4.add(CP4);	
+			     //create a window for piechart	
+			     frame4 = new JFrame("Eutrophication Potential");	
+			     frame4.setLayout(new BorderLayout());	
+			     frame4.add(panel_chart4, BorderLayout.WEST);	
+			     frame4.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
+			     frame4.setSize(new Dimension(800, 600));	
+			     frame4.setResizable(true);	
+			     panel_chart4.setPreferredSize(new Dimension(frame4.getWidth()-120, frame4.getHeight()-150));	
+			     frame4.pack();	
+			     frame4.setVisible(true);	
+
+			   //add XY charts 5	     			
+			     DefaultCategoryDataset dataset5 = 	
+			    	      new DefaultCategoryDataset( );
+			      dataset5.addValue( POCP2 , "Construction" , case_name );        	
+			      dataset5.addValue( POCP4 , "Operation" , case_name );        	
+			      dataset5.addValue( POCP6 , "Scrapping" , case_name ); 	
+			      dataset5.addValue( POCP , "Total" , case_name );     	
+				
+			  // Generate the graph	
+			     JFreeChart chart5 = ChartFactory.createBarChart(	
+			     "Photochemical Ozone Creation Potential", // Title	
+			     "Life Stages", // x-axis Label	
+			     "POCP (ton C2H6e)", // y-axis Label	
+			     dataset5, // Dataset	
+			     PlotOrientation.HORIZONTAL, // Plot Orientation	
+			     true, // Show Legend	
+			     true, // Use tooltips	
+			     false // Configure chart to generate URLs?	
+			  );	
+			     ChartPanel CP5 = new ChartPanel(chart5);	
+			     	
+			     panel_chart5 = new JPanel();	
+			     panel_chart5.add(CP5);	
+			     //create a window for piechart	
+			     frame5 = new JFrame("Photochemical Ozone Creation Potential");	
+			     frame5.setLayout(new BorderLayout());	
+			     frame5.add(panel_chart5, BorderLayout.WEST);	
+			     frame5.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
+			     frame5.setSize(new Dimension(800, 600));	
+			     frame5.setResizable(true);	
+			     panel_chart5.setPreferredSize(new Dimension(frame5.getWidth()-120, frame5.getHeight()-150));	
+			     frame5.pack();	
+			     frame5.setVisible(true);	
+
+			   //add XY charts 6	     			
+			     DefaultCategoryDataset dataset6 = 	
+			    	      new DefaultCategoryDataset( );
+			      dataset6.addValue( RA4 , "Construction" , case_name );        	
+			      dataset6.addValue( RA2 , "Operation" , case_name );        	
+			      dataset6.addValue( RA6 , "Scrapping" , case_name ); 	
+			      dataset6.addValue( RA , "Total" , case_name );     	
+				
+			  // Generate the graph	
+			     JFreeChart chart6 = ChartFactory.createBarChart(	
+			     "Risk Assessment- RPN", // Title	
+			     "Life Stages", // x-axis Label	
+			     "Risk Priority Number", // y-axis Label	
+			     dataset6, // Dataset	
+			     PlotOrientation.HORIZONTAL, // Plot Orientation	
+			     true, // Show Legend	
+			     true, // Use tooltips	
+			     false // Configure chart to generate URLs?	
+			  );	
+			     ChartPanel CP6 = new ChartPanel(chart6);	
+			     	
+			     panel_chart6 = new JPanel();	
+			     panel_chart6.add(CP6);	
+			     //create a window for piechart	
+			     frame6 = new JFrame("Risk Assessment- RPN");	
+			     frame6.setLayout(new BorderLayout());	
+			     frame6.add(panel_chart6, BorderLayout.WEST);	
+			     frame6.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
+			     frame6.setSize(new Dimension(800, 600));	
+			     frame6.setResizable(true);	
+			     panel_chart6.setPreferredSize(new Dimension(frame6.getWidth()-120, frame6.getHeight()-150));	
+			     frame6.pack();	
+			     frame6.setVisible(true);	
+
+			   //add XY charts 7	     			
+			     DefaultCategoryDataset dataset7 = 	
+			    	      new DefaultCategoryDataset( );
+			      dataset7.addValue( sum2+GWP2*P_GWP+AP2*P_AP+EP2*P_EP+POCP2*P_POCP+RA4/1000*CoTL, "Construction" , case_name );        	
+			      dataset7.addValue( sum4+GWP4*P_GWP+AP4*P_AP+EP4*P_EP+POCP4*P_POCP+RA2/1000*CoTL , "Operation" , case_name );        	
+			      dataset7.addValue( sum6+GWP6*P_GWP+AP6*P_AP+EP6*P_EP+POCP6*P_POCP+RA6/1000*CoTL , "Scrapping" , case_name ); 	
+			      dataset7.addValue( sum+GWP*P_GWP+AP*P_AP+EP*P_EP+POCP*P_POCP+RA/1000*CoTL , "Total" , case_name );     	
+				
+			  // Generate the graph	
+			     JFreeChart chart7 = ChartFactory.createBarChart(	
+			     "Total Life Cycle Cost", // Title	
+			     "Life Stages", // x-axis Label	
+			     "Cost ($)", // y-axis Label	
+			     dataset7, // Dataset	
+			     PlotOrientation.HORIZONTAL, // Plot Orientation	
+			     true, // Show Legend	
+			     true, // Use tooltips	
+			     false // Configure chart to generate URLs?	
+			  );	
+			     ChartPanel CP7 = new ChartPanel(chart7);	
+			     	
+			     panel_chart7 = new JPanel();	
+			     panel_chart7.add(CP7);	
+			     //create a window for piechart	
+			     frame7 = new JFrame("Total Life Cycle Cost");	
+			     frame7.setLayout(new BorderLayout());	
+			     frame7.add(panel_chart7, BorderLayout.WEST);	
+			     frame7.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
+			     frame7.setSize(new Dimension(800, 600));	
+			     frame7.setResizable(true);	
+			     panel_chart7.setPreferredSize(new Dimension(frame7.getWidth()-120, frame7.getHeight()-150));	
+			     frame7.pack();	
+			     frame7.setVisible(true);	
+
+			     FileOutputStream fout;
+				  Date d = new Date();
+				  SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss") ;
+				    
+				
+				try {
+					fout = new FileOutputStream("C:/Users/tjb12178/workspace/04012018/result_"+case_name+"_" +dateFormat.format(d)+".xls");
+				
+				HSSFWorkbook wb1 = new HSSFWorkbook();
+				HSSFSheet sheet1 = wb1.createSheet("Sheet1");
+				HSSFRow row0 = sheet1.createRow(0);
+				HSSFRow row1 = sheet1.createRow(1);
+				HSSFRow row2 = sheet1.createRow(2);
+				
+				HSSFCell item0 = row0.createCell(0);
+				HSSFCell item1 = row0.createCell(1);
+				HSSFCell item2 = row0.createCell(2);
+				HSSFCell item3 = row0.createCell(3);
+				HSSFCell item4 = row0.createCell(4);
+				HSSFCell item5 = row0.createCell(5);
+				
+				HSSFCell num0 = row1.createCell(0);
+				HSSFCell num1 = row1.createCell(1);
+				HSSFCell num2 = row1.createCell(2);
+				HSSFCell num3 = row1.createCell(3);
+				HSSFCell num4 = row1.createCell(4);
+				HSSFCell num5 = row1.createCell(5);
+				
+				HSSFCell unit0 = row2.createCell(0);
+				HSSFCell unit1 = row2.createCell(1);
+				HSSFCell unit2 = row2.createCell(2);
+				HSSFCell unit3 = row2.createCell(3);
+				HSSFCell unit4 = row2.createCell(4);
+				HSSFCell unit5 = row2.createCell(5);
+				
+				num0.setCellType(CellType.STRING);
+				num0.setCellValue("Total life cycle cost");
+				num1.setCellValue(sum2+GWP2*P_GWP+AP2*P_AP+EP2*P_EP+POCP2*P_POCP+RA4/1000*CoTL);
+				num1.setCellType(CellType.NUMERIC);
+				num2.setCellValue(sum4+GWP4*P_GWP+AP4*P_AP+EP4*P_EP+POCP4*P_POCP+RA2/1000*CoTL);
+				num2.setCellType(CellType.NUMERIC);
+				num3.setCellValue(0);
+				num3.setCellType(CellType.NUMERIC);
+				num4.setCellValue(sum6+GWP6*P_GWP+AP6*P_AP+EP6*P_EP+POCP6*P_POCP+RA6/1000*CoTL);
+				num4.setCellType(CellType.NUMERIC);
+				num5.setCellValue(sum+GWP*P_GWP+AP*P_AP+EP*P_EP+POCP*P_POCP+RA/1000*CoTL);
+				num5.setCellType(CellType.NUMERIC);
+				
+				item0.setCellType(CellType.STRING);
+				item1.setCellType(CellType.STRING);
+				item2.setCellType(CellType.STRING);
+				item3.setCellType(CellType.STRING);
+				item4.setCellType(CellType.STRING);
+				item5.setCellType(CellType.STRING);
+				
+				item0.setCellValue("Life stages");
+				item1.setCellValue("Construction");
+				item2.setCellValue("Operation");
+				item3.setCellValue("Maintenance");
+				item4.setCellValue("Scrapping");
+				item5.setCellValue("Total cost");
+
+				
+				
+				
+				unit0.setCellType(CellType.STRING);
+				unit1.setCellType(CellType.STRING);
+				unit2.setCellType(CellType.STRING);
+				unit3.setCellType(CellType.STRING);
+				unit4.setCellType(CellType.STRING);
+				unit5.setCellType(CellType.STRING);
+
+				
+				unit0.setCellValue("Unit");
+				unit1.setCellValue("$");
+				unit2.setCellValue("$");
+				unit3.setCellValue("$");
+				unit4.setCellValue("$");
+				unit5.setCellValue("$");
+
+			
+				wb1.write(fout);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}    
+			     
+			     
+			}});
+//		//save
+//		saveButton.addActionListener(new ActionListener() {
+//
+//			public void actionPerformed(ActionEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//			
+//		});
+//		//compare
+		//System.out.println(q);
+	
+	     panel6 = createPanel("");	//add panel 
+		 tp.addTab("Comparison",ii,panel6,"Comparison");
+	     tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	     tp.setTabPlacement(JTabbedPane.TOP);
+	     panel6.setLayout(new BoxLayout(panel6,BoxLayout.Y_AXIS));
+	     //setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+   
+	   
+
+		 
+	     JPanel panel61 = new JPanel();
+	     panel61.setAlignmentX(Component.CENTER_ALIGNMENT);
+	     panel61.setLayout(new FlowLayout());
+	     JTextField F61 = new JTextField("Results for Alternative 1");
+	     F61.setFont(font_1);
+	     F61.setPreferredSize(new Dimension (frame.getWidth()-320,frame.getHeight()/3-100));
+	     JButton B61 = new JButton("select file");
+	     B61.setFont(font_1);
+	     B61.setPreferredSize(new Dimension (160,frame.getHeight()/3-100));
+	     B61.addActionListener(new ActionListener(){
+			@Override
+	 		public void actionPerformed(ActionEvent e) {
+	 			JFileChooser chooser = new JFileChooser();
+	 		    int filename = chooser.showOpenDialog(null);
+	 			if (filename == JFileChooser.APPROVE_OPTION){
+	 			File f = chooser.getSelectedFile();
+	//BufferedReader br=new BufferedReader(new FileReader(f));
+	 			try {
+					Workbook 	wb_r1 = Workbook.getWorkbook(f);
+					Sheet 	sheet_r = wb_r1.getSheet(0);
+					Cell 	c1=sheet_r.getCell(1, 1);
+					Cell 	c2=sheet_r.getCell(2, 1);
+					Cell 	c3=sheet_r.getCell(3, 1);
+					Cell	c4=sheet_r.getCell(4, 1);
+					Cell	c5=sheet_r.getCell(5, 1);
+					
+					String s1 = c1.getContents(); 
+					String s2 = c2.getContents(); 
+					String s3 = c3.getContents(); 
+					String s4 = c4.getContents(); 
+					String s5 = c5.getContents(); 
+					
+					double r1 = Double.parseDouble(s1);
+					double r2 = Double.parseDouble(s2);
+					double r3 = Double.parseDouble(s3);
+					double r4 = Double.parseDouble(s4);
+					double r5 = Double.parseDouble(s5);
+					
+					a_result[0] =r1;
+					a_result[1] =r2;
+					a_result[2] =r3;
+					a_result[3] =r4;
+					a_result[4] =r5;
+					
+					
+				     System.out.println(a_result[0]);	 
+				     System.out.println(a_result[1]);	
+				     System.out.println(a_result[2]);	
+				     System.out.println(a_result[3]);	
+				     System.out.println(a_result[4]);	
+
+
+					
+					
+					
+				} catch (BiffException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	 			
+	 			
+	 			
+	}}});
+	
+	     
+	     JPanel panel62 = new JPanel();
+	     panel62.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+	     panel62.setLayout(new FlowLayout());
+	     JTextField F62 = new JTextField("Results for Alternative 2");
+	     F62.setFont(font_1);
+	     F62.setPreferredSize(new Dimension (frame.getWidth()-320,frame.getHeight()/3-100));
+	     JButton B62 = new JButton("select file");
+	     B62.setFont(font_1);
+
+	     B62.setPreferredSize(new Dimension (160, frame.getHeight()/3-100));
+	     B62.addActionListener(new ActionListener(){
+			@Override
+	 		public void actionPerformed(ActionEvent e) {
+	 			JFileChooser chooser = new JFileChooser();
+	 		    int filename = chooser.showOpenDialog(null);
+	 			if (filename == JFileChooser.APPROVE_OPTION){
+	 			File f = chooser.getSelectedFile();
+	//BufferedReader br=new BufferedReader(new FileReader(f));
+	 			
+	 			try {
+					Workbook 	wb_r1 = Workbook.getWorkbook(f);
+					Sheet 	sheet_r = wb_r1.getSheet(0);
+					Cell 	c1=sheet_r.getCell(1, 1);
+					Cell 	c2=sheet_r.getCell(2, 1);
+					Cell 	c3=sheet_r.getCell(3, 1);
+					Cell	c4=sheet_r.getCell(4, 1);
+					Cell	c5=sheet_r.getCell(5, 1);
+					
+					String s1 = c1.getContents(); 
+					String s2 = c2.getContents(); 
+					String s3 = c3.getContents(); 
+					String s4 = c4.getContents(); 
+					String s5 = c5.getContents(); 
+					
+					double r1 = Double.parseDouble(s1);
+					double r2 = Double.parseDouble(s2);
+					double r3 = Double.parseDouble(s3);
+					double r4 = Double.parseDouble(s4);
+					double r5 = Double.parseDouble(s5);
+					
+					b_result[0] =r1;
+					b_result[1] =r2;
+					b_result[2] =r3;
+					b_result[3] =r4;
+					b_result[4] =r5;
+					
+					
+				     System.out.println(b_result[0]);	 
+				     System.out.println(b_result[1]);	
+				     System.out.println(b_result[2]);	
+				     System.out.println(b_result[3]);	
+				     System.out.println(b_result[4]);	
+
+					
+					
+					
+				} catch (BiffException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	 			
+	 			
+	 			
+	}}});
+	     
+	     JPanel panel63 = new JPanel();
+	     panel63.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+	     panel63.setLayout(new FlowLayout());
+	     JTextField F63 = new JTextField("Results for Alternative 3");
+	     F63.setPreferredSize(new Dimension (frame.getWidth()-320,frame.getHeight()/3-100));
+	     JButton B63 = new JButton("select file");
+	     F63.setFont(font_1);
+	     B63.setFont(font_1);
+
+	     B63.setPreferredSize(new Dimension (160,frame.getHeight()/3-100));
+	     B63.addActionListener(new ActionListener(){
+			@Override
+	 		public void actionPerformed(ActionEvent e) {
+	 			JFileChooser chooser = new JFileChooser();
+	 		    int filename = chooser.showOpenDialog(null);
+	 			if (filename == JFileChooser.APPROVE_OPTION){
+	 			File f = chooser.getSelectedFile();
+	//BufferedReader br=new BufferedReader(new FileReader(f));
+	 			try {
+					Workbook 	wb_r1 = Workbook.getWorkbook(f);
+					Sheet 	sheet_r = wb_r1.getSheet(0);
+					Cell 	c1=sheet_r.getCell(1, 1);
+					Cell 	c2=sheet_r.getCell(2, 1);
+					Cell 	c3=sheet_r.getCell(3, 1);
+					Cell	c4=sheet_r.getCell(4, 1);
+					Cell	c5=sheet_r.getCell(5, 1);
+					
+					String s1 = c1.getContents(); 
+					String s2 = c2.getContents(); 
+					String s3 = c3.getContents(); 
+					String s4 = c4.getContents(); 
+					String s5 = c5.getContents(); 
+					
+					double r1 = Double.parseDouble(s1);
+					double r2 = Double.parseDouble(s2);
+					double r3 = Double.parseDouble(s3);
+					double r4 = Double.parseDouble(s4);
+					double r5 = Double.parseDouble(s5);
+					
+					c_result[0] =r1;
+					c_result[1] =r2;
+					c_result[2] =r3;
+					c_result[3] =r4;
+					c_result[4] =r5;
+					
+					
+				     System.out.println(c_result[0]);	 
+				     System.out.println(c_result[1]);	
+				     System.out.println(c_result[2]);	
+				     System.out.println(c_result[3]);	
+				     System.out.println(c_result[4]);	
+
+
+					
+					
+					
+				} catch (BiffException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	 			
+	 			
+	 			
+	}}}); 
+	     
+	     panel61.add(F61,LEFT_ALIGNMENT);
+	     panel61.add(B61,LEFT_ALIGNMENT);
+	     panel62.add(F62,LEFT_ALIGNMENT);
+	     panel62.add(B62,LEFT_ALIGNMENT);
+	     panel63.add(F63,LEFT_ALIGNMENT);
+	     panel63.add(B63,LEFT_ALIGNMENT);
+
+	    panel6.add(panel61);
+	    panel6.add(panel62);
+	    panel6.add(panel63);
+
+
+	    		 
+	     
+	     JButton Button_FC = new JButton("Compare Results");
+	     Button_FC.setName("Compare Results");
+	     Button_FC.setAlignmentX(Component.CENTER_ALIGNMENT);
+	     panel6.add(Button_FC);
+	     Button_FC.addActionListener(new ActionListener(){
+				
+		@Override
+		public void actionPerformed(ActionEvent e) {
+	    		 
+				    System.out.println(a_result[0]);
+				    
+				    DefaultCategoryDataset dataset_r = 	
+				    	      new DefaultCategoryDataset( );
+				      dataset_r.addValue( a_result[0], F61.getText(),"Construction"); 
+				      dataset_r.addValue( b_result[0], F62.getText(),"Construction");
+				      dataset_r.addValue( c_result[0], F63.getText(),"Construction");        	
+
+				      dataset_r.addValue( a_result[1], F61.getText(),"Operation");      
+				      dataset_r.addValue( b_result[1], F62.getText(),"Operation");
+				      dataset_r.addValue( c_result[1], F63.getText(),"Operation"); 
+				      
+				      dataset_r.addValue( a_result[2], F61.getText(),"Maintenance");       	
+				      dataset_r.addValue( b_result[2], F62.getText(),"Maintenance");
+				      dataset_r.addValue( c_result[2], F63.getText(),"Maintenance"); 
+ 
+				      dataset_r.addValue( a_result[3], F61.getText(),"Scrapping"); 	
+				      dataset_r.addValue( b_result[3], F62.getText(),"Scrapping"); 
+				      dataset_r.addValue( c_result[3], F63.getText(),"Scrapping"); 
+
+				      dataset_r.addValue( a_result[4], F61.getText(),"Total");       	
+				      dataset_r.addValue( b_result[4], F62.getText(),"Total"); 
+				      dataset_r.addValue( c_result[4], F63.getText(),"Total"); 
+
+				      
+					
+				  // Generate the graph	
+				     JFreeChart chart_r = ChartFactory.createBarChart(	
+				     "Comparison of Total Life Cycle Cost", // Title	
+				     "Life Stages", // x-axis Label	
+				     "Total Life Cycle Cost ($)", // y-axis Label	
+				     dataset_r, // Dataset	
+				     PlotOrientation.HORIZONTAL, // Plot Orientation	
+				     true, // Show Legend	
+				     true, // Use tooltips	
+				     false // Configure chart to generate URLs?	
+				  );	
+				     ChartPanel CP_r = new ChartPanel(chart_r);	
+				     	
+				     panel_chart_r = new JPanel();	
+				     panel_chart_r.add(CP_r);	
+				     //create a window for piechart	
+				     frame_r = new JFrame("Comparison of Total Life Cycle Cost");	
+				     frame_r.setLayout(new BorderLayout());	
+				     frame_r.add(panel_chart_r, BorderLayout.WEST);	
+				     frame_r.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
+				     frame_r.setSize(new Dimension(800, 600));	
+				     frame_r.setResizable(true);	
+				     panel_chart_r.setPreferredSize(new Dimension(frame_r.getWidth()-120, frame_r.getHeight()-150));	
+				     frame_r.pack();	
+				     frame_r.setVisible(true);	
+				    
+				    
+			}});
+	     
+	 
+	}
+//create main panel	
+	private JPanel createPanel(String string) {
+	     
+	     panel = new JPanel(true);
+	     panel.setPreferredSize(new Dimension(frame.getWidth()-200,frame.getHeight()-200));
+	     panel.setLayout(new BorderLayout(1,1));
+	     JLabel filler = new JLabel(string);
+	     filler.setFont(font_1);
+	     filler.setHorizontalAlignment(JLabel.CENTER);
+	     panel.add(filler);
+	     return panel;
+	  }
+//	private JPanel createFCPanel(String string) {
+//	     
+//		panel_FC = createPanel(string);
+//	 	panel_FC.setVisible(true);
+//	 	panel_FC.setPreferredSize(new Dimension(1080, 200));
+//	    panel_FC.setLayout(new GridBagLayout()); // added code
+//	    GridBagConstraints c_sub = new GridBagConstraints();
+//	    Dimension d = new Dimension(100,80);
+//		return panel_FC;
+//	    }
+	
+	private JPanel createNewPanel(String string) {
+	     
+		panel_n = createPanel(string);
+	 	panel_n.setVisible(true);
+	 	panel_n.setPreferredSize(new Dimension(frame.getWidth()-300, 200));
+	    panel_n.setLayout(new GridBagLayout()); // added code
+	    GridBagConstraints c_sub = new GridBagConstraints();
+	    Dimension d = new Dimension(100,80);
+
+//create label
+	    JLabel lbl = new JLabel();
+	    lbl.setName(string);
+	    
+	    lbl.setFont(new Font("Serif", Font.PLAIN, 22));
+//	    lbl.setFont(new Font("Serif", Font.PLAIN, 24));
+	    lbl.setPreferredSize(new Dimension(70,50));
+	    c_sub.fill = GridBagConstraints.VERTICAL;
+	    c_sub.weighty = 1;
+	    c_sub.gridx = 0;
+	    c_sub.gridy = 0;
+	    panel_n.add(lbl,c_sub);
+	    
+	    area = new JTextArea(string);
+	    area.setFont(font_1);
+
+	    area.setPreferredSize(new Dimension(frame.getWidth()-300,frame.getWidth()/4-10));
+	    c_sub.fill = GridBagConstraints.VERTICAL;
+	    c_sub.weighty = 1;
+	    c_sub.gridx = 0;
+	    c_sub.gridy = 1;
+	    area.setEditable(false);
+	    panel_n.add(area,c_sub);
+	    
+	    panel_n.setVisible(true); // added code
+	    return panel_n; 
+	  }
+//create subpanels with lables, drop lists and text field 	
+	private JPanel createsubPanel(String string) throws BiffException, IOException {
+
+			panel_m = createPanel(string);
+		 	panel_m.setVisible(true);
+		 	panel_m.setPreferredSize(new Dimension(200, 200));
+		    panel_m.setLayout(new GridBagLayout()); // added code
+		    GridBagConstraints c_sub = new GridBagConstraints();
+		    Dimension d = new Dimension(100,80);
+
+//create label
+		    JLabel lbl = new JLabel();
+		    lbl.setName(string);
+		    lbl.setFont(font_1);
+		    c_sub.fill = GridBagConstraints.VERTICAL;
+		    c_sub.weighty = 1;
+		    c_sub.gridx = 0;
+		    c_sub.gridy = 0;
+		    panel_m.add(lbl,c_sub);
+
+//create drop list for database selection
+		    choices = new String[file_group.length];
+		    choices_NAME = new String[file_group.length];
+		    int[] pos = new int[file_group.length];
+		    for(int j=0;j<file_group.length;j++){
+		    	
+		    	//choices[j]=Integer.toString(j);
+		    	choices_NAME[j]= file_group[j].getName();
+		    	pos[j]=choices_NAME[j].lastIndexOf(".");
+		    	if(pos[j] >0){
+		    		choices[j]=choices_NAME[j].substring(0, pos[j]);
+		    	}
+		    	
+		    
+		    }
+
+		    cb = new JComboBox<String>(choices);
+		    cb.setName(string);
+		    cb.setFont(font_1);
+		    cb.setPreferredSize(new Dimension(200,20)); // added code
+		    c_sub.fill = GridBagConstraints.VERTICAL;
+		    c_sub.weighty = 1;
+		    c_sub.gridx = 0;
+		    c_sub.gridy = 1;
+		    panel_m.add(cb,c_sub);
+		    
+//create field for user inputs		    		    
+		    field = new JTextField("Value");
+		    field.setPreferredSize(new Dimension(200,20));
+		    field.setFont(font_1);
+		    c_sub.fill = GridBagConstraints.VERTICAL;
+		    c_sub.weighty = 1;
+		    c_sub.gridx = 0;
+		    c_sub.gridy = 2;
+		    panel_m.add(field,c_sub);
+
+		    panel_m.setVisible(true); // added code
+		    return panel_m; 
+ }	
+	
+//add icons	
+	 @SuppressWarnings("unused")
+	private ImageIcon createImageIcon(String string) {
+		 String string1 = "C:/Users/tjb12178/workspace/04012018/icon.png";
+	     if(string1 == null)
+	     {
+	         System.out.println("the image "+string1+" is not exist!");
+	         return null;
+	     }
+	     else return new ImageIcon(string1);
+	  }
+	 
+	 
+//add action ddbb
+	 private ActionListener createActionListener(int j){
+		 ActionListener ddbb=  new ActionListener() {
+
+				public void actionPerformed(ActionEvent db) {
+				String selection = Integer.toString(cb_m[j].getSelectedIndex());
+				
+//Modify to be related to file_group.length	??
+				//System.out.println(Double.parseDouble(selection));
+				
+				for(int kk = 0;kk<file_group.length;kk++){
+					if(Double.parseDouble(selection)==kk)
+					{
+						for(int i=0;i<data_length;i++){
+							data0[i]	 = 	content0	[kk][i];
+							data1[i]	 = 	content1	[kk][i];
+							data2[i]	 = 	content2	[kk][i];
+							data3[i]	 = 	content3	[kk][i];
+							data4[i]	 = 	content4	[kk][i];
+					}}};
+		
+				Object[] columnNames = {
+						"Type", "Average", "Minimum","Maximum","Unit",
+	                   };
+	//add database here				     
+			    
+				data = new Object[data_length][5];
+				for(int k=0; k<data_length;k++){
+//					data[k][0]=wb_num.getSheet(0).getCell(0,k).getContents();
+//					data[k][2]=wb_num.getSheet(0).getCell(2,k).getContents();
+					data[k][0] = data0[k];
+					data[k][1] = data1[k];
+					data[k][2] = data2[k];
+					data[k][3] = data3[k];
+					data[k][4] = data4[k];
+				};
+			    
+			     DTM = new DefaultTableModel(data, columnNames);
+				 JTable[] table_db1 = new JTable[activity_length];
+				 table_db1 [j] = new JTable(DTM);
+			     JScrollPane sp_db1 = new JScrollPane(table_db1[j]);
+	     	     JLabel label_db1 = new JLabel("Database selection");
+			     label_db1.setSize(new Dimension (10,10));
+    
+				 panel_db = new JPanel();
+				 panel_db.setLayout(new BoxLayout(panel_db,BoxLayout.Y_AXIS));
+			     panel_db.setName("database"+selection);
+			     panel_db.add(label_db1);
+			     label_db1.setAlignmentX(Component.CENTER_ALIGNMENT);
+			     panel_db.add(sp_db1);
+			     table_db1[j].setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+			   //add button	  
+			     JButton[] updateButton = new JButton[activity_length];
+			     updateButton[j] = new JButton("Update");
+			     //updateButton[k].setName("Update");
+			     updateButton[j].setAlignmentX(Component.CENTER_ALIGNMENT);
+			     panel_db.add(updateButton[j]);
+
+		//add action for clicking button	     
+			     updateButton[j].addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						TableModel DTM2 = table_db1[j].getModel();
+						for (int k = 0;k<data_length;k++){
+							
+							data_m1[k][j]=(String) DTM2.getValueAt(k, 1);
+							data_m2[k][j]=(String) DTM2.getValueAt(k, 2);
+							data_m3[k][j]=(String) DTM2.getValueAt(k, 3);
+						}}});
+			     //create a window for db
+			     frame_db = new JFrame(cb_m[j].getName()+" Database");
+			     frame_db.setLayout(new BorderLayout());
+			     frame_db.add(panel_db,BorderLayout.WEST);
+			     frame_db.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			     frame_db.setSize(new Dimension(820, 1020));
+			     frame_db.setResizable(true);
+			     panel_db.setPreferredSize(new Dimension(frame_db.getWidth()-350, frame_db.getHeight()-400));
+			     frame_db.pack();
+			     frame_db.setVisible(true);
+			
+				}
+				};
+	return ddbb;
+	 }
+	 
+//main function
+//main function to run to show GUI	 
+	public static void main(String[] args) {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+            
+				try {
+					createAndShowGUI();
+				} catch (BiffException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+            
+            }
+		);
+	}
+	
+//create frame
+	private static void createAndShowGUI() throws BiffException, IOException {
+	//Create and set up the window.
+  
+	//	JFrame.setDefaultLookAndFeelDecorated(true);
+	frame = new JFrame("SHIPLYS");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(screenSize );
+    
+    //Create and set up the content pane.
+    JComponent newContentPane = new Gui();
+    frame.setLayout(new BorderLayout());
+    frame.add(newContentPane,BorderLayout.WEST);
+    frame.setExtendedState(JFrame.NORMAL);
+    frame.setResizable(true);
+    
+    panel0.setPreferredSize(new Dimension (frame.getWidth()-50, frame.getHeight()-150));//new Dimension(frame.getWidth()-35, frame.getHeight()-120)
+
+    
+    
+    //Add menu
+	//Create the menu bar.
+	menuBar = new JMenuBar();
+
+	//Build the first menu.
+	menu = new JMenu("File");
+	menu.setMnemonic(KeyEvent.VK_A);
+	menu.getAccessibleContext().setAccessibleDescription(
+	        "The only menu in this program that has menu items");
+	menuBar.add(menu);
+
+	//a group of JMenuItems
+	menuItem = new JMenuItem("A text-only menu item",
+	                         KeyEvent.VK_T);
+	menuItem.setAccelerator(KeyStroke.getKeyStroke(
+	        KeyEvent.VK_1, ActionEvent.ALT_MASK));
+	menuItem.getAccessibleContext().setAccessibleDescription(
+	        "This doesn't really do anything");
+	menu.add(menuItem);
+
+	menuItem = new JMenuItem("Both text and icon",
+	                         new ImageIcon("images/middle.gif"));
+	menuItem.setMnemonic(KeyEvent.VK_B);
+	menu.add(menuItem);
+
+	menuItem = new JMenuItem(new ImageIcon("images/middle.gif"));
+	menuItem.setMnemonic(KeyEvent.VK_D);
+	menu.add(menuItem);
+
+	//a group of radio button menu items
+	menu.addSeparator();
+	ButtonGroup group = new ButtonGroup();
+	rbMenuItem = new JRadioButtonMenuItem("A radio button menu item");
+	rbMenuItem.setSelected(true);
+	rbMenuItem.setMnemonic(KeyEvent.VK_R);
+	group.add(rbMenuItem);
+	menu.add(rbMenuItem);
+
+	rbMenuItem = new JRadioButtonMenuItem("Another one");
+	rbMenuItem.setMnemonic(KeyEvent.VK_O);
+	group.add(rbMenuItem);
+	menu.add(rbMenuItem);
+
+	//a group of check box menu items
+	menu.addSeparator();
+	cbMenuItem = new JCheckBoxMenuItem("A check box menu item");
+	cbMenuItem.setMnemonic(KeyEvent.VK_C);
+	menu.add(cbMenuItem);
+
+	cbMenuItem = new JCheckBoxMenuItem("Another one");
+	cbMenuItem.setMnemonic(KeyEvent.VK_H);
+	menu.add(cbMenuItem);
+
+	//a submenu
+	menu.addSeparator();
+	submenu = new JMenu("A submenu");
+	submenu.setMnemonic(KeyEvent.VK_S);
+
+	menuItem = new JMenuItem("An item in the submenu");
+	menuItem.setAccelerator(KeyStroke.getKeyStroke(
+	        KeyEvent.VK_2, ActionEvent.ALT_MASK));
+	submenu.add(menuItem);
+
+	menuItem = new JMenuItem("Another item");
+	submenu.add(menuItem);
+	menu.add(submenu);
+
+	//Build second menu in the menu bar.
+	menu = new JMenu("Edit");
+	menu.setMnemonic(KeyEvent.VK_N);
+	menu.getAccessibleContext().setAccessibleDescription(
+	        "This menu does nothing");
+	menuBar.add(menu);
+
+	menu = new JMenu("Help");
+	menu.setMnemonic(KeyEvent.VK_N);
+	menu.getAccessibleContext().setAccessibleDescription(
+	        "This menu does nothing");
+	menuBar.add(menu);
+	
+
+	frame.setJMenuBar(menuBar);
+	frame.setIconImage(new ImageIcon("C:/Users/tjb12178/workspace/04012018/icon.png").getImage());
+    
+    //Display the window.
+    frame.pack();
+    frame.setVisible(true);
+    }
+}
